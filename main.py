@@ -1,11 +1,28 @@
 from flask import Flask, request, jsonify
 import joblib
 import numpy as np
+import traceback
+from google.cloud import storage
+import os
 
 app = Flask(__name__)
 
-# Load the pre-trained model (make sure the path is correct)
-model = joblib.load('assignment_model.pkl')
+# Constants
+BUCKET_NAME = 'prod-dataset-assign-task-2'
+MODEL_FILENAME = 'pkl/assignment_model_2.pkl'
+LOCAL_MODEL_PATH = f'/tmp/{MODEL_FILENAME}'  # Cloud Run/App Engine allows writing to /tmp
+
+# Function to download model from GCS
+def download_model_from_gcs(bucket_name, blob_name, local_path):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(blob_name)
+    blob.download_to_filename(local_path)
+    print(f"Downloaded model to {local_path}")
+
+# Download and load the model once at startup
+download_model_from_gcs(BUCKET_NAME, MODEL_FILENAME, LOCAL_MODEL_PATH)
+model = joblib.load(LOCAL_MODEL_PATH)
 
 # Function to calculate skill match count and percentage
 def calculate_skill_match(skills_required, employee_skills):
