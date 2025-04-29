@@ -17,6 +17,7 @@ def download_model_from_gcs(bucket_name, blob_name, local_path):
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
+    os.makedirs(os.path.dirname(LOCAL_MODEL_PATH), exist_ok=True)
     blob.download_to_filename(local_path)
     print(f"Downloaded model to {local_path}")
 
