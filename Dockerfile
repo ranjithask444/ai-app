@@ -12,7 +12,7 @@ WORKDIR /app
 # Copy all project files into the container
 COPY . /app
 
-RUN chmod +x mvnw
+#RUN chmod +x mvnw
 
 # Install dependencies
 RUN pip install --no-cache-dir --upgrade pip \
