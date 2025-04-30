@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # Constants
 BUCKET_NAME = 'prod-dataset-assign-task-2'
-MODEL_FILENAME = 'pkl/assignment_model_2.pkl'
+MODEL_FILENAME = 'pkl/assignment_model_3.pkl'
 LOCAL_MODEL_PATH = f'/tmp/{MODEL_FILENAME}'  # Cloud Run/App Engine allows writing to /tmp
 
 # Function to download model from GCS
