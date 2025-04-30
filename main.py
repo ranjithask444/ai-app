@@ -31,6 +31,7 @@ def load_model():
         return jsonify({"message": "Model already loaded"}), 200
 
     try:
+        print('!!! Starting download !!!')
         os.makedirs(os.path.dirname(LOCAL_MODEL_PATH), exist_ok=True)
         client = storage.Client()
         bucket = client.bucket(BUCKET_NAME)
@@ -39,6 +40,7 @@ def load_model():
 
         model = joblib.load(LOCAL_MODEL_PATH)
         model_loaded = True
+        print('!!! downloaded successfully !!!')
         return jsonify({"message": "Model loaded successfully"}), 200
     except Exception as e:
         traceback.print_exc()
