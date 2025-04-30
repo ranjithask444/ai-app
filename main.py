@@ -21,9 +21,28 @@ def download_model_from_gcs(bucket_name, blob_name, local_path):
     blob.download_to_filename(local_path)
     print(f"Downloaded model to {local_path}")
 
-# Download and load the model once at startup
-download_model_from_gcs(BUCKET_NAME, MODEL_FILENAME, LOCAL_MODEL_PATH)
-model = joblib.load(LOCAL_MODEL_PATH)
+model = None
+model_loaded = False
+
+@app.route('/load-model', methods=['POST'])
+def load_model():
+    global model, model_loaded
+    if model_loaded:
+        return jsonify({"message": "Model already loaded"}), 200
+
+    try:
+        os.makedirs(os.path.dirname(LOCAL_MODEL_PATH), exist_ok=True)
+        client = storage.Client()
+        bucket = client.bucket(BUCKET_NAME)
+        blob = bucket.blob(MODEL_FILENAME)
+        blob.download_to_filename(LOCAL_MODEL_PATH)
+
+        model = joblib.load(LOCAL_MODEL_PATH)
+        model_loaded = True
+        return jsonify({"message": "Model loaded successfully"}), 200
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
 
 # Function to calculate skill match count and percentage
 def calculate_skill_match(skills_required, employee_skills):
@@ -106,6 +125,7 @@ def predict_assignment():
         return jsonify(response)
 
     except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 
